@@ -5,12 +5,12 @@ const forge = require('node-forge')
 const util = require('./util')
 
 class CMS {
-  constructor (keystore) {
-    if (!keystore) {
-      throw new Error('keystore is required')
+  constructor (keychain) {
+    if (!keychain) {
+      throw new Error('keychain is required')
     }
 
-    this.keystore = keystore
+    this.keychain = keychain
   }
 
   createAnonymousEncryptedData (name, plain, callback) {
@@ -19,13 +19,13 @@ class CMS {
       return callback(new Error('Data is required'))
     }
 
-    self.keystore._getPrivateKey(name, (err, key) => {
+    self.keychain._getPrivateKey(name, (err, key) => {
       if (err) {
         return callback(err)
       }
 
       try {
-        const privateKey = forge.pki.decryptRsaPrivateKey(key, self.keystore._())
+        const privateKey = forge.pki.decryptRsaPrivateKey(key, self.keychain._())
         util.certificateForKey(privateKey, (err, certificate) => {
           if (err) return callback(err)
 
@@ -73,18 +73,18 @@ class CMS {
       })
     async.detect(
       recipients,
-      (r, cb) => self.keystore.findKeyById(r.keyId, (err, info) => cb(null, !err && info)),
+      (r, cb) => self.keychain.findKeyById(r.keyId, (err, info) => cb(null, !err && info)),
       (err, r) => {
         if (err) return callback(err)
         if (!r) return callback(new Error('No key found for decryption'))
 
         async.waterfall([
-          (cb) => self.keystore.findKeyById(r.keyId, cb),
-          (key, cb) => self.keystore._getPrivateKey(key.name, cb)
+          (cb) => self.keychain.findKeyById(r.keyId, cb),
+          (key, cb) => self.keychain._getPrivateKey(key.name, cb)
         ], (err, pem) => {
           if (err) return callback(err)
 
-          const privateKey = forge.pki.decryptRsaPrivateKey(pem, self.keystore._())
+          const privateKey = forge.pki.decryptRsaPrivateKey(pem, self.keychain._())
           cms.decrypt(r.recipient, privateKey)
           async.setImmediate(() => callback(null, Buffer.from(cms.content.getBytes(), 'binary')))
         })
