@@ -13,6 +13,14 @@
     "release-minor": "aegir release --type minor",
     "release-major": "aegir release --type major"
   },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "engines": {
+    "node": ">=6.0.0",
+    "npm": ">=3.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/libp2p/js-libp2p-keychain.git"
@@ -30,6 +38,7 @@
   },
   "homepage": "https://github.com/libp2p/js-libp2p-keychain#readme",
   "devDependencies": {
-    "aegir": "^12.2.0"
+    "aegir": "^12.2.0",
+    "pre-commit": "^1.2.2"
   }
 }
