@@ -45,7 +45,7 @@
     "async": "^2.6.0",
     "deepmerge": "^1.5.2",
     "interface-datastore": "~0.4.1",
-    "libp2p-crypto": "~0.10.3",
+    "libp2p-crypto": "github:libp2p/js-libp2p-crypto#jsrsasign",
     "multihashes": "~0.4.12",
     "node-forge": "~0.7.1",
     "pull-stream": "^3.6.1",
