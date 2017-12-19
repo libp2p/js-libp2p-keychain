@@ -4,7 +4,6 @@
 const sanitize = require('sanitize-filename')
 const deepmerge = require('deepmerge')
 const crypto = require('libp2p-crypto')
-const CMS = require('./cms')
 const DS = require('interface-datastore')
 const pull = require('pull-stream')
 
@@ -128,9 +127,6 @@ class Keychain {
       opts.dek.keyLength,
       opts.dek.hash)
     Object.defineProperty(this, '_', { value: () => dek })
-
-    // Provide access to protected messages
-    this.cms = new CMS(this)
   }
 
   /**
