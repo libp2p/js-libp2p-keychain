@@ -222,7 +222,17 @@ module.exports = (datastore1, datastore2) => {
         })
       })
 
-      it('key exists', (done) => {
+      it('key id exists', (done) => {
+        ks.findKeyById(alice.toB58String(), (err, key) => {
+          expect(err).to.not.exist()
+          expect(key).to.exist()
+          expect(key).to.have.property('name', 'alice')
+          expect(key).to.have.property('id', alice.toB58String())
+          done()
+        })
+      })
+
+      it('key name exists', (done) => {
         ks.findKeyByName('alice', (err, key) => {
           expect(err).to.not.exist()
           expect(key).to.exist()
