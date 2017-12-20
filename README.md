@@ -88,8 +88,7 @@ A private key is stored as an encrypted PKCS 8 structure in the PEM format. It i
 The default options for generating the derived encryption key are in the `dek` object
 ```js
 const defaultOptions = {
-  createIfNeeded: true,
-
+  
   //See https://cryptosense.com/parameter-choice-for-pbkdf2/
   dek: {
     keyLength: 512 / 8,
