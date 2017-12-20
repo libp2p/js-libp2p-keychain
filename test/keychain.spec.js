@@ -20,7 +20,6 @@ module.exports = (datastore1, datastore2) => {
     let ks
 
     before((done) => {
-      // emptyKeystore = new Keychain(datastore1, { passPhrase: passPhrase })
       ks = new Keychain(datastore2, { passPhrase: passPhrase })
       done()
     })
