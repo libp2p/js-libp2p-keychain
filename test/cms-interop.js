@@ -52,7 +52,7 @@ cn4oisOvxCprs4aM9UVjtZTCjfyNpX8UWwT1W3rySV+KQNhxuMy3RzmL
       })
     })
 
-      it('decrypts node-forge example', (done) => {
+      it.skip('decrypts node-forge example', (done) => {
         const example = `
 MIIBcwYJKoZIhvcNAQcDoIIBZDCCAWACAQAxgfowgfcCAQAwYDBbMQ0wCwYDVQQK
 EwRpcGZzMREwDwYDVQQLEwhrZXlzdG9yZTE3MDUGA1UEAxMuUW1OekJxUHdwNDJI
@@ -63,7 +63,7 @@ knU1yykWGkdlbclCuu0NaAfmb8o0OX50CbEKZB7xmsv8tnqn0H0jMF4GCSqGSIb3
 DQEHATAdBglghkgBZQMEASoEEP/PW1JWehQx6/dsLkp/Mf+gMgQwFM9liLTqC56B
 nHILFmhac/+a/StQOKuf9dx5qXeGvt9LnwKuGGSfNX4g+dTkoa6N
 `
-        ks.cms.readData(Buffer.from(example, 'base64'), (err, plain) => {
+        ks.cms.decrypt(Buffer.from(example, 'base64'), (err, plain) => {
           expect(err).to.not.exist()
           expect(plain).to.exist()
           expect(plain.toString()).to.equal(plainData.toString())

@@ -16,11 +16,12 @@ module.exports = (datastore1, datastore2) => {
     const rsaKeyName = 'tajné jméno'
     const renamedRsaKeyName = 'ชื่อลับ'
     let rsaKeyInfo
-    // let emptyKeystore
+    let emptyKeystore
     let ks
 
     before((done) => {
       ks = new Keychain(datastore2, { passPhrase: passPhrase })
+      emptyKeystore = new Keychain(datastore1, { passPhrase: passPhrase })
       done()
     })
 
@@ -167,6 +168,57 @@ module.exports = (datastore1, datastore2) => {
           done()
         })
       })
+    })
+
+    describe('CMS protected data', () => {
+      const plainData = Buffer.from('This is a message from Alice to Bob')
+      let cms
+
+      it('service is available', (done) => {
+        expect(ks).to.have.property('cms')
+        done()
+      })
+
+      it.skip('is anonymous', (done) => {
+        ks.cms.encrypt(rsaKeyName, plainData, (err, msg) => {
+          expect(err).to.not.exist()
+          expect(msg).to.exist()
+          expect(msg).to.be.instanceOf(Buffer)
+          cms = msg
+          done()
+        })
+      })
+
+      it.skip('is a PKCS #7 message', (done) => {
+        ks.cms.decrypt("not CMS", (err) => {
+          expect(err).to.exist()
+          done()
+        })
+      })
+
+      it.skip('is a PKCS #7 binary message', (done) => {
+        ks.cms.decrypt(plainData, (err) => {
+          expect(err).to.exist()
+          done()
+        })
+      })
+
+      it.skip('cannot be read without the key', (done) => {
+        emptyKeystore.cms.decrypt(cms, (err, plain) => {
+          expect(err).to.exist()
+          done()
+        })
+      })
+
+      it.skip('can be read with the key', (done) => {
+        ks.cms.decrypt(cms, (err, plain) => {
+          expect(err).to.not.exist()
+          expect(plain).to.exist()
+          expect(plain.toString()).to.equal(plainData.toString())
+          done()
+        })
+      })
+
     })
 
     describe('exported key', () => {

@@ -6,6 +6,7 @@ const deepmerge = require('deepmerge')
 const crypto = require('libp2p-crypto')
 const DS = require('interface-datastore')
 const pull = require('pull-stream')
+const CMS = require('./cms')
 
 const keyPrefix = '/pkcs8/'
 const infoPrefix = '/info/'
@@ -86,8 +87,8 @@ function DsInfoName (name) {
  * Manages the lifecycle of a key. Keys are encrypted at rest using PKCS #8.
  *
  * A key in the store has two entries
- * - '/info/key-name', contains the KeyInfo for the key
- * - '/pkcs8/key-name', contains the PKCS #8 for the key
+ * - '/info/*key-name*', contains the KeyInfo for the key
+ * - '/pkcs8/*key-name*', contains the PKCS #8 for the key
  *
  */
 class Keychain {
@@ -148,6 +149,15 @@ class Keychain {
     const saltLength = Math.ceil(NIST.minSaltLength / 3) * 3 // no base64 padding
     options.dek.salt = crypto.randomBytes(saltLength).toString('base64')
     return options
+  }
+
+  /**
+   * Gets an object that can encrypt/decrypt protected data.
+   *
+   * @returns {CMS}
+   */
+  get cms () {
+    return new CMS(this)
   }
 
   /**
