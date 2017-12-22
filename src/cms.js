@@ -20,7 +20,7 @@ class CMS {
 
     this.keychain = keychain
   }
-  
+
   /**
    * Creates some protected data.
    *
@@ -28,7 +28,7 @@ class CMS {
    * @param {Buffer} plain - The data to encrypt.
    * @param {function(Error, Buffer)} callback
    * @returns {undefined}
-   */ 
+   */
   encrypt (name, plain, callback) {
     throw new Error('NYI')
   }
@@ -43,7 +43,6 @@ class CMS {
   decrypt (cms, callback) {
     throw new Error('NYI')
   }
-  
 }
 
 module.exports = CMS

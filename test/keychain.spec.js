@@ -190,7 +190,7 @@ module.exports = (datastore1, datastore2) => {
       })
 
       it.skip('is a PKCS #7 message', (done) => {
-        ks.cms.decrypt("not CMS", (err) => {
+        ks.cms.decrypt('not CMS', (err) => {
           expect(err).to.exist()
           done()
         })
@@ -218,7 +218,6 @@ module.exports = (datastore1, datastore2) => {
           done()
         })
       })
-
     })
 
     describe('exported key', () => {
