@@ -179,7 +179,21 @@ module.exports = (datastore1, datastore2) => {
         done()
       })
 
-      it.skip('is anonymous', (done) => {
+      it('requires a key', (done) => {
+        ks.cms.encrypt('no-key', plainData, (err, msg) => {
+          expect(err).to.exist()
+          done()
+        })
+      })
+
+      it('requires plain data as a Buffer', (done) => {
+        ks.cms.encrypt(rsaKeyName, 'plain data', (err, msg) => {
+          expect(err).to.exist()
+          done()
+        })
+      })
+
+      it.skip('encrypts', (done) => {
         ks.cms.encrypt(rsaKeyName, plainData, (err, msg) => {
           expect(err).to.not.exist()
           expect(msg).to.exist()
