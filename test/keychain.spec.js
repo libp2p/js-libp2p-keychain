@@ -193,7 +193,7 @@ module.exports = (datastore1, datastore2) => {
         })
       })
 
-      it.skip('encrypts', (done) => {
+      it('encrypts', (done) => {
         ks.cms.encrypt(rsaKeyName, plainData, (err, msg) => {
           expect(err).to.not.exist()
           expect(msg).to.exist()
