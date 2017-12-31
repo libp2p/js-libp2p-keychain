@@ -131,12 +131,17 @@ class Keychain {
   }
 
   /**
-   * The default options for a keychain.
+   * Gets an object that can encrypt/decrypt protected data
+   * using the Cryptographic Message Syntax (CMS).
    *
-   * @returns {object}
+   * CMS describes an encapsulation syntax for data protection. It
+   * is used to digitally sign, digest, authenticate, or encrypt
+   * arbitrary message content.
+   *
+   * @returns {CMS}
    */
-  static get options () {
-    return defaultOptions
+  get cms () {
+    return new CMS(this)
   }
 
   /**
@@ -153,11 +158,12 @@ class Keychain {
 
   /**
    * Gets an object that can encrypt/decrypt protected data.
+   * The default options for a keychain.
    *
-   * @returns {CMS}
+   * @returns {object}
    */
-  get cms () {
-    return new CMS(this)
+  static get options () {
+    return defaultOptions
   }
 
   /**

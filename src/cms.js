@@ -5,11 +5,13 @@ const forge = require('node-forge')
 const util = require('./util')
 
 /**
- * Cryptographic Message Syntax (aka PKCS #7 and RFC 5652)
+ * Cryptographic Message Syntax (aka PKCS #7)
  *
  * CMS describes an encapsulation syntax for data protection. It
  * is used to digitally sign, digest, authenticate, or encrypt
  * arbitrary message content.
+ *
+ * See RFC 5652 for all the details.
  */
 class CMS {
   /**
