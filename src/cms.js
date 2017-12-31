@@ -75,12 +75,65 @@ class CMS {
   /**
    * Reads some protected data.
    *
-   * @param {Buffer} cms - The CMS encrypted data to decrypt.
+   * The keychain must contain one of the keys used to encrypt the data.  If none of the keys
+   * exists, an Error is returned with the property 'missingKeys'.  It is array of key ids.
+   *
+   * @param {Buffer} cmsData - The CMS encrypted data to decrypt.
    * @param {function(Error, Buffer)} callback
    * @returns {undefined}
    */
-  decrypt (cms, callback) {
-    throw new Error('NYI')
+  decrypt (cmsData, callback) {
+    const done = (err, result) => async.setImmediate(() => callback(err, result))
+
+    if (!Buffer.isBuffer(cmsData)) {
+      return done(new Error('CMS data is required'))
+    }
+
+    const self = this
+    let cms
+    try {
+      const buf = forge.util.createBuffer(cmsData.toString('binary'))
+      const obj = forge.asn1.fromDer(buf)
+      cms = forge.pkcs7.messageFromAsn1(obj)
+    } catch (err) {
+      return done(new Error('Invalid CMS: ' + err.message))
+    }
+
+    // Find a recipient whose key we hold. We only deal with recipient certs
+    // issued by ipfs (O=ipfs).
+    const recipients = cms.recipients
+      .filter(r => r.issuer.find(a => a.shortName === 'O' && a.value === 'ipfs'))
+      .filter(r => r.issuer.find(a => a.shortName === 'CN'))
+      .map(r => {
+        return {
+          recipient: r,
+          keyId: r.issuer.find(a => a.shortName === 'CN').value
+        }
+      })
+    async.detect(
+      recipients,
+      (r, cb) => self.keychain.findKeyById(r.keyId, (err, info) => cb(null, !err && info)),
+      (err, r) => {
+        if (err) return done(err)
+        if (!r) {
+          const missingKeys = recipients.map(r => r.keyId)
+          err = new Error('Decryption needs one of the key(s): ' + missingKeys.join(', '))
+          err.missingKeys = missingKeys
+          return done(err)
+        }
+
+        async.waterfall([
+          (cb) => self.keychain.findKeyById(r.keyId, cb),
+          (key, cb) => self.keychain._getPrivateKey(key.name, cb)
+        ], (err, pem) => {
+          if (err) return done(err)
+
+          const privateKey = forge.pki.decryptRsaPrivateKey(pem, self.keychain._())
+          cms.decrypt(r.recipient, privateKey)
+          done(null, Buffer.from(cms.content.getBytes(), 'binary'))
+        })
+      }
+    )
   }
 }
 

@@ -203,28 +203,30 @@ module.exports = (datastore1, datastore2) => {
         })
       })
 
-      it.skip('is a PKCS #7 message', (done) => {
+      it('is a PKCS #7 message', (done) => {
         ks.cms.decrypt('not CMS', (err) => {
           expect(err).to.exist()
           done()
         })
       })
 
-      it.skip('is a PKCS #7 binary message', (done) => {
+      it('is a PKCS #7 binary message', (done) => {
         ks.cms.decrypt(plainData, (err) => {
           expect(err).to.exist()
           done()
         })
       })
 
-      it.skip('cannot be read without the key', (done) => {
+      it('cannot be read without the key', (done) => {
         emptyKeystore.cms.decrypt(cms, (err, plain) => {
           expect(err).to.exist()
+          expect(err).to.have.property('missingKeys')
+          expect(err.missingKeys).to.eql([rsaKeyInfo.id])
           done()
         })
       })
 
-      it.skip('can be read with the key', (done) => {
+      it('can be read with the key', (done) => {
         ks.cms.decrypt(cms, (err, plain) => {
           expect(err).to.not.exist()
           expect(plain).to.exist()
