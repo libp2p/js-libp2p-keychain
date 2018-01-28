@@ -22,7 +22,7 @@ const defaultOptions = {
   // See https://cryptosense.com/parametesr-choice-for-pbkdf2/
   dek: {
     keyLength: 512 / 8,
-    iterationCount: 1000,
+    iterationCount: 10000,
     salt: 'you should override this value with a crypto secure random number',
     hash: 'sha2-512'
   }
