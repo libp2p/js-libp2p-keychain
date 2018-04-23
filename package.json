@@ -43,9 +43,9 @@
   "homepage": "https://github.com/libp2p/js-libp2p-keychain#readme",
   "dependencies": {
     "async": "^2.6.0",
-    "deepmerge": "^1.5.2",
     "interface-datastore": "~0.4.2",
     "libp2p-crypto": "~0.13.0",
+    "lodash.merge": "^4.6.1",
     "pull-stream": "^3.6.1",
     "sanitize-filename": "^1.6.1"
   },
