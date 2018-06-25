@@ -36,7 +36,6 @@
     "secure",
     "crypto"
   ],
-  "author": "Richard Schneider <makaretu@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/libp2p/js-libp2p-keychain/issues"
