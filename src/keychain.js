@@ -25,7 +25,8 @@ const defaultOptions = {
     iterationCount: 10000,
     salt: 'you should override this value with a crypto secure random number',
     hash: 'sha2-512'
-  }
+  },
+  passPhrase: 'correcthorsebatterystaple'
 }
 
 function validateKeyName (name) {

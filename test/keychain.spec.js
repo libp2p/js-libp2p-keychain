@@ -25,8 +25,8 @@ module.exports = (datastore1, datastore2) => {
       done()
     })
 
-    it('needs a pass phrase to encrypt a key', () => {
-      expect(() => new Keychain(datastore2)).to.throw()
+    it('does not need a pass phrase to encrypt a key', () => {
+      expect(() => new Keychain(datastore2)).to.not.throw()
     })
 
     it('needs a NIST SP 800-132 non-weak pass phrase', () => {
