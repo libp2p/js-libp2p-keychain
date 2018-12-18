@@ -46,7 +46,7 @@
     "interface-datastore": "~0.6.0",
     "libp2p-crypto": "libp2p/js-libp2p-crypto#feat/bundle-size",
     "merge-options": "^1.0.1",
-    "node-forge": "^0.7.6",
+    "node-forge": "~0.7.6",
     "pull-stream": "^3.6.8",
     "sanitize-filename": "^1.6.1"
   },
@@ -59,7 +59,7 @@
     "dirty-chai": "^2.0.1",
     "level-js": "^4.0.0",
     "mocha": "^5.2.0",
-    "multihashes": "^0.4.14",
+    "multihashes": "~0.4.14",
     "peer-id": "~0.10.7",
     "rimraf": "^2.6.2"
   },
