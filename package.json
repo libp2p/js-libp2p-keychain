@@ -45,6 +45,7 @@
     "async": "^2.6.1",
     "interface-datastore": "~0.6.0",
     "libp2p-crypto": "~0.16.0",
+    "libp2p-crypto-secp256k1": "~0.2.3",
     "merge-options": "^1.0.1",
     "node-forge": "~0.7.6",
     "pull-stream": "^3.6.8",
