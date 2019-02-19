@@ -16,6 +16,8 @@ module.exports = (datastore1, datastore2) => {
     const keyName = 'tajné jméno'
     const renamedKeyName = 'ชื่อลับ'
     let keyInfo
+    let ecKeyInfo
+    let secpKeyInfo
     let emptyKeystore
     let ks
 
@@ -85,15 +87,17 @@ module.exports = (datastore1, datastore2) => {
         ks.createKey(keyName + 'ed25519', 'ed25519', 2048, (err, info) => {
           expect(err).to.not.exist()
           expect(info).exist()
+          ecKeyInfo = info
           done()
         })
       })
 
-      xit('can be an secp256k1 key', function (done) {
+      it('can be an secp256k1 key', function (done) {
         this.timeout(50 * 1000)
         ks.createKey(keyName + 'secp256k1', 'secp256k1', 2048, (err, info) => {
           expect(err).to.not.exist()
           expect(info).exist()
+          secpKeyInfo = info
           done()
         })
       })
@@ -280,6 +284,8 @@ module.exports = (datastore1, datastore2) => {
 
     describe('exported key', () => {
       let pemKey
+      let ed25519Key
+      let secp256k1Key
 
       it('is a PKCS #8 encrypted pem', (done) => {
         ks.exportKey(keyName, 'password', (err, pem) => {
@@ -295,6 +301,42 @@ module.exports = (datastore1, datastore2) => {
           expect(err).to.not.exist()
           expect(key.name).to.equal('imported-key')
           expect(key.id).to.equal(keyInfo.id)
+          done()
+        })
+      })
+
+      it('can export ed25519 key', (done) => {
+        ks.exportKey(keyName + 'ed25519', (err, key) => {
+          expect(err).to.not.exist()
+          ed25519Key = key
+          expect(key).to.exist()
+          done()
+        })
+      })
+
+      it('ed25519 key can be imported', (done) => {
+        ks.importKey('imported-key-ed25199', ed25519Key, (err, key) => {
+          expect(err).to.not.exist()
+          expect(key.name).to.equal('imported-key-ed25199')
+          expect(key.id).to.equal(ecKeyInfo.id)
+          done()
+        })
+      })
+
+      it('can export secp256k1 key', (done) => {
+        ks.exportKey(keyName + 'secp256k1', (err, key) => {
+          expect(err).to.not.exist()
+          secp256k1Key = key
+          expect(key).to.exist()
+          done()
+        })
+      })
+
+      it('secp256k1 key can be imported', (done) => {
+        ks.importKey('imported-key-secp256k1', secp256k1Key, (err, key) => {
+          expect(err).to.not.exist()
+          expect(key.name).to.equal('imported-key-secp256k1')
+          expect(key.id).to.equal(secpKeyInfo.id)
           done()
         })
       })

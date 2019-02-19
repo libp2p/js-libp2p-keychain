@@ -214,7 +214,7 @@ class Keychain {
           if (err) return _error(callback, err)
 
           if (type === 'ed25519' || type === 'secp256k1') {
-            const keypairMarshal = keypair.marshal()
+            const keypairMarshal = keypair.bytes
             self._storeKey(name, kid, keypairMarshal, dsname, callback)
           } else {
             keypair.export(this._(), (err, pem) => {
@@ -365,11 +365,15 @@ class Keychain {
    * If it's as an RSA key, include a password to export as a PEM encrypted PKCS #8 string
    *
    * @param {string} name - The local key name; must already exist.
-   * @param {string} password - The password
+   * @param {string} password - The password, for RSA keys (optional)
    * @param {function(Error, string)} callback
    * @returns {undefined}
    */
   exportKey (name, password, callback) {
+    if (typeof password === 'function' && typeof callback === 'undefined') {
+      callback = password
+      password = undefined
+    }
     if (!validateKeyName(name)) {
       return _error(callback, `Invalid key name '${name}'`)
     }
@@ -379,14 +383,14 @@ class Keychain {
       if (err) {
         return _error(callback, `Key '${name}' does not exist. ${err.message}`)
       }
-      const encKey = res.toString()
       if (password) {
+        const encKey = res.toString()
         crypto.keys.import(encKey, this._(), (err, privateKey) => {
           if (err) return _error(callback, err)
           privateKey.export(password, callback)
         })
       } else {
-        crypto.keys.unmarshalPrivateKey(encKey, callback)
+        crypto.keys.unmarshalPrivateKey(res, callback)
       }
     })
   }
@@ -397,18 +401,23 @@ class Keychain {
    *
    * @param {string} name - The local key name; must not already exist.
    * @param {string} encKey - The encoded key. If it's an RSA key, it needs to be a PEM encoded PKCS #8 string
-   * @param {string} password - The password for RSA keys.
+   * @param {string} password - The password for RSA keys. (optional)
    * @param {function(Error, KeyInfo)} callback
    * @returns {undefined}
    */
   importKey (name, encKey, password, callback) {
     const self = this
+    if (typeof password === 'function' && typeof callback === 'undefined') {
+      callback = password
+      password = undefined
+    }
     if (!validateKeyName(name) || name === 'self') {
       return _error(callback, `Invalid key name '${name}'`)
     }
     if (!encKey) {
       return _error(callback, 'The encoded key is required')
     }
+
     const dsname = DsName(name)
     self.store.has(dsname, (err, exists) => {
       if (err) return _error(callback, err)
@@ -426,10 +435,9 @@ class Keychain {
           })
         })
       } else {
-        const privateKey = crypto.keys.marshalPrivateKey(encKey)
-        privateKey.id((err, kid) => {
+        encKey.id((err, kid) => {
           if (err) return _error(callback, err)
-          self._storeKey(name, kid, encKey, dsname, callback)
+          self._storeKey(name, kid, encKey.bytes, dsname, callback)
         })
       }
     })
