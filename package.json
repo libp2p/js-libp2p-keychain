@@ -17,8 +17,7 @@
     "coverage-publish": "aegir coverage publish"
   },
   "pre-push": [
-    "lint",
-    "test"
+    "lint"
   ],
   "engines": {
     "node": ">=6.0.0",
