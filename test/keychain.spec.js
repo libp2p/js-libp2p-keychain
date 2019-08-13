@@ -84,9 +84,21 @@ module.exports = (datastore1, datastore2) => {
         return expect(pem).to.startsWith('-----BEGIN ENCRYPTED PRIVATE KEY-----')
       })
 
+      it('throws if an invalid private key name is given', async () => {
+        const err = await ks._getPrivateKey(undefined).then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_INVALID_KEY_NAME')
+      })
+
+      it('throws if a private key cant be found', async () => {
+        const err = await ks._getPrivateKey('not real').then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_KEY_NOT_FOUND')
+      })
+
       it('does not overwrite existing key', async () => {
-        const error = await ks.createKey(rsaKeyName, 'rsa', 2048).then(fail, err => err)
-        expect(error).to.have.property('code', 'ERR_KEY_ALREADY_EXISTS')
+        const err = await ks.createKey(rsaKeyName, 'rsa', 2048).then(fail, err => err)
+        expect(err).to.have.property('code', 'ERR_KEY_ALREADY_EXISTS')
       })
 
       it('cannot create the "self" key', async () => {
@@ -208,6 +220,18 @@ module.exports = (datastore1, datastore2) => {
     describe('exported key', () => {
       let pemKey
 
+      it('requires the password', async () => {
+        const err = await ks.exportKey(rsaKeyName).then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_PASSWORD_REQUIRED')
+      })
+
+      it('requires the key name', async () => {
+        const err = await ks.exportKey(undefined, 'password').then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_INVALID_KEY_NAME')
+      })
+
       it('is a PKCS #8 encrypted pem', async () => {
         pemKey = await ks.exportKey(rsaKeyName, 'password')
         expect(pemKey).to.startsWith('-----BEGIN ENCRYPTED PRIVATE KEY-----')
@@ -217,6 +241,12 @@ module.exports = (datastore1, datastore2) => {
         const key = await ks.importKey('imported-key', pemKey, 'password')
         expect(key.name).to.equal('imported-key')
         expect(key.id).to.equal(rsaKeyInfo.id)
+      })
+
+      it('requires the pem', async () => {
+        const err = await ks.importKey('imported-key', undefined, 'password').then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_PEM_REQUIRED')
       })
 
       it('cannot be imported as an existing key name', async () => {
@@ -245,6 +275,18 @@ module.exports = (datastore1, datastore2) => {
         const key = await ks.importPeer('alice', alice)
         expect(key.name).to.equal('alice')
         expect(key.id).to.equal(alice.toB58String())
+      })
+
+      it('private key import requires a valid name', async () => {
+        const err = await ks.importPeer(undefined, alice).then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_INVALID_KEY_NAME')
+      })
+
+      it('private key import requires the peer', async () => {
+        const err = await ks.importPeer('alice').then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_MISSING_PRIVATE_KEY')
       })
 
       it('key id exists', async () => {
@@ -308,6 +350,12 @@ module.exports = (datastore1, datastore2) => {
         expect(key).to.exist()
         expect(key).to.have.property('name', renamedRsaKeyName)
         expect(key).to.have.property('id', rsaKeyInfo.id)
+      })
+
+      it('throws with invalid key names', async () => {
+        const err = await ks.findKeyByName(undefined).then(fail, err => err)
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_INVALID_KEY_NAME')
       })
     })
 
