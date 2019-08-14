@@ -39,15 +39,13 @@ class CMS {
    * @returns {undefined}
    */
   async encrypt (name, plain) {
-    const self = this
-
     if (!Buffer.isBuffer(plain)) {
       throw errcode(new Error('Plain data must be a Buffer'), 'ERR_INVALID_PARAMS')
     }
 
-    const key = await self.keychain.findKeyByName(name)
-    const pem = await self.keychain._getPrivateKey(name)
-    const privateKey = forge.pki.decryptRsaPrivateKey(pem, self.keychain._())
+    const key = await this.keychain.findKeyByName(name)
+    const pem = await this.keychain._getPrivateKey(name)
+    const privateKey = forge.pki.decryptRsaPrivateKey(pem, this.keychain._())
     const certificate = await certificateForKey(key, privateKey)
 
     // create a p7 enveloped message
@@ -75,7 +73,6 @@ class CMS {
       throw errcode(new Error('CMS data is required'), 'ERR_INVALID_PARAMS')
     }
 
-    const self = this
     let cms
     try {
       const buf = forge.util.createBuffer(cmsData.toString('binary'))
@@ -99,7 +96,7 @@ class CMS {
 
     const r = await findAsync(recipients, async (recipient) => {
       try {
-        const key = await self.keychain.findKeyById(recipient.keyId)
+        const key = await this.keychain.findKeyById(recipient.keyId)
         if (key) return true
       } catch (err) {
         return false
@@ -114,9 +111,9 @@ class CMS {
       })
     }
 
-    const key = await self.keychain.findKeyById(r.keyId)
-    const pem = await self.keychain._getPrivateKey(key.name)
-    const privateKey = forge.pki.decryptRsaPrivateKey(pem, self.keychain._())
+    const key = await this.keychain.findKeyById(r.keyId)
+    const pem = await this.keychain._getPrivateKey(key.name)
+    const privateKey = forge.pki.decryptRsaPrivateKey(pem, this.keychain._())
     cms.decrypt(r.recipient, privateKey)
     return Buffer.from(cms.content.getBytes(), 'binary')
   }
