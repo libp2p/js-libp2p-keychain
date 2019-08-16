@@ -172,7 +172,7 @@ class Keychain {
    * @param {string} name - The local key name; cannot already exist.
    * @param {string} type - One of the key types; 'rsa'.
    * @param {int} size - The key size in bits.
-   * @returns {undefined}
+    * @returns {KeyInfo}
    */
   async createKey (name, type, size) {
     const self = this
@@ -228,7 +228,7 @@ class Keychain {
   /**
    * List all the keys.
    *
-   * @returns {undefined}
+    * @returns {KeyInfo[]}
    */
   async listKeys () {
     const self = this
@@ -248,7 +248,7 @@ class Keychain {
    * Find a key by it's id.
    *
    * @param {string} id - The universally unique key identifier.
-   * @returns {undefined}
+    * @returns {KeyInfo}
    */
   async findKeyById (id) {
     try {
@@ -263,7 +263,7 @@ class Keychain {
    * Find a key by it's name.
    *
    * @param {string} name - The local key name.
-   * @returns {undefined}
+    * @returns {KeyInfo}
    */
   async findKeyByName (name) {
     if (!validateKeyName(name)) {
@@ -283,7 +283,7 @@ class Keychain {
    * Remove an existing key.
    *
    * @param {string} name - The local key name; must already exist.
-   * @returns {undefined}
+    * @returns {KeyInfo}
    */
   async removeKey (name) {
     const self = this
@@ -304,7 +304,7 @@ class Keychain {
    *
    * @param {string} oldName - The old local key name; must already exist.
    * @param {string} newName - The new local key name; must not already exist.
-   * @returns {undefined}
+    * @returns {KeyInfo}
    */
   async renameKey (oldName, newName) {
     const self = this
@@ -342,7 +342,7 @@ class Keychain {
    *
    * @param {string} name - The local key name; must already exist.
    * @param {string} password - The password
-   * @returns {undefined}
+    * @returns {string}
    */
   async exportKey (name, password) {
     if (!validateKeyName(name)) {
@@ -369,7 +369,7 @@ class Keychain {
    * @param {string} name - The local key name; must not already exist.
    * @param {string} pem - The PEM encoded PKCS #8 string
    * @param {string} password - The password.
-   * @returns {undefined}
+    * @returns {KeyInfo}
    */
   async importKey (name, pem, password) {
     const self = this
@@ -444,7 +444,7 @@ class Keychain {
    * Gets the private key as PEM encoded PKCS #8 string.
    *
    * @param {string} name
-   * @returns {undefined}
+    * @returns {string}
    * @private
    */
   async _getPrivateKey (name) {
