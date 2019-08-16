@@ -318,23 +318,27 @@ class Keychain {
     const newDsname = DsName(newName)
     const oldInfoName = DsInfoName(oldName)
     const newInfoName = DsInfoName(newName)
-    let res = await this.store.get(oldDsname)
-    const pem = res.toString()
 
     const exists = await self.store.has(newDsname)
     if (exists) return throwDelayed(errcode(new Error(`Key '${newName}' already exists`), 'ERR_KEY_ALREADY_EXISTS'))
 
-    res = await self.store.get(oldInfoName)
+    try {
+      let res = await this.store.get(oldDsname)
+      const pem = res.toString()
+      res = await self.store.get(oldInfoName)
 
-    const keyInfo = JSON.parse(res.toString())
-    keyInfo.name = newName
-    const batch = self.store.batch()
-    batch.put(newDsname, pem)
-    batch.put(newInfoName, JSON.stringify(keyInfo))
-    batch.delete(oldDsname)
-    batch.delete(oldInfoName)
-    await batch.commit()
-    return keyInfo
+      const keyInfo = JSON.parse(res.toString())
+      keyInfo.name = newName
+      const batch = self.store.batch()
+      batch.put(newDsname, pem)
+      batch.put(newInfoName, JSON.stringify(keyInfo))
+      batch.delete(oldDsname)
+      batch.delete(oldInfoName)
+      await batch.commit()
+      return keyInfo
+    } catch (err) {
+      return throwDelayed(err)
+    }
   }
 
   /**
@@ -422,22 +426,23 @@ class Keychain {
     const privateKey = peer.privKey
     const dsname = DsName(name)
     const exists = await self.store.has(dsname)
-    // if (err) return throwDelayed(callback, err)
     if (exists) return throwDelayed(errcode(new Error(`Key '${name}' already exists`), 'ERR_KEY_ALREADY_EXISTS'))
 
-    const kid = await privateKey.id()
-    // if (err) return throwDelayed(callback, err)
-    const pem = await privateKey.export(this._())
-    // if (err) return throwDelayed(callback, err)
-    const keyInfo = {
-      name: name,
-      id: kid
+    try {
+      const kid = await privateKey.id()
+      const pem = await privateKey.export(this._())
+      const keyInfo = {
+        name: name,
+        id: kid
+      }
+      const batch = self.store.batch()
+      batch.put(dsname, pem)
+      batch.put(DsInfoName(name), JSON.stringify(keyInfo))
+      await batch.commit()
+      return keyInfo
+    } catch (err) {
+      return throwDelayed(err)
     }
-    const batch = self.store.batch()
-    batch.put(dsname, pem)
-    batch.put(DsInfoName(name), JSON.stringify(keyInfo))
-    await batch.commit()
-    return keyInfo
   }
 
   /**
