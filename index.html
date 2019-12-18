@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset='utf-8'>
-  <title>libp2p-keychain 0.5.2 | Documentation</title>
+  <title>libp2p-keychain 0.5.3 | Documentation</title>
   <meta name='description' content='Key management and cryptographically protected messages'>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' rel='stylesheet'>
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>libp2p-keychain</h3>
-          <div class='mb1'><code>0.5.2</code></div>
+          <div class='mb1'><code>0.5.3</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -29,6 +29,16 @@
                   href='#intro'
                   class="h5 bold black caps">
                   Intro
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#keyinfo'
+                  class="">
+                  KeyInfo
                   
                 </a>
                 
@@ -129,16 +139,6 @@
               
                 
                 <li><a
-                  href='#keyinfo'
-                  class="">
-                  KeyInfo
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#cms'
                   class=" toggle-sibling">
                   CMS
@@ -234,12 +234,88 @@
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='keyinfo'>
+      KeyInfo
+    </h3>
+    
+    
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L77-L84'>
+      <span>src/keychain.js</span>
+      </a>
+    
+  </div>
+  
+
+  <p>Information about a key.</p>
+
+    <div class='pre p1 fill-light mt0'>KeyInfo</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The universally unique key id.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+          : The local key name.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='keychain'>
       Keychain
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L95-L489'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L94-L467'>
       <span>src/keychain.js</span>
       </a>
     
@@ -315,7 +391,7 @@
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L153-L158'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L152-L157'>
       <span>src/keychain.js</span>
       </a>
     
@@ -379,7 +455,7 @@
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L166-L168'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L165-L167'>
       <span>src/keychain.js</span>
       </a>
     
@@ -452,7 +528,7 @@ The default options for a keychain.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L144-L146'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L143-L145'>
       <span>src/keychain.js</span>
       </a>
     
@@ -520,7 +596,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L178-L233'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L177-L225'>
       <span>src/keychain.js</span>
       </a>
     
@@ -616,7 +692,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L240-L252'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L232-L244'>
       <span>src/keychain.js</span>
       </a>
     
@@ -680,7 +756,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L260-L267'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L252-L259'>
       <span>src/keychain.js</span>
       </a>
     
@@ -758,7 +834,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L275-L287'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L267-L279'>
       <span>src/keychain.js</span>
       </a>
     
@@ -836,7 +912,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L295-L307'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L287-L299'>
       <span>src/keychain.js</span>
       </a>
     
@@ -914,7 +990,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L316-L349'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L308-L341'>
       <span>src/keychain.js</span>
       </a>
     
@@ -1001,7 +1077,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L358-L379'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L350-L367'>
       <span>src/keychain.js</span>
       </a>
     
@@ -1088,7 +1164,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L389-L432'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/keychain.js#L377-L414'>
       <span>src/keychain.js</span>
       </a>
     
@@ -1187,88 +1263,12 @@ arbitrary message content.</p>
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='keyinfo'>
-      KeyInfo
-    </h3>
-    
-    
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/keychain.js#L78-L85'>
-      <span>src/keychain.js</span>
-      </a>
-    
-  </div>
-  
-
-  <p>Information about a key.</p>
-
-    <div class='pre p1 fill-light mt0'>KeyInfo</div>
-  
-    <p>
-      Type:
-      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Properties</div>
-    <div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>id</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The universally unique key id.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-          : The local key name.
-
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
     <h3 class='fl m0' id='cms'>
       CMS
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/cms.js#L18-L120'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/cms.js#L18-L120'>
       <span>src/cms.js</span>
       </a>
     
@@ -1336,7 +1336,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/cms.js#L41-L60'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/cms.js#L41-L60'>
       <span>src/cms.js</span>
       </a>
     
@@ -1424,7 +1424,7 @@ arbitrary message content.</p>
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/cms.js#L71-L119'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/cms.js#L71-L119'>
       <span>src/cms.js</span>
       </a>
     
@@ -1512,7 +1512,7 @@ exists, an Error is returned with the property 'missingKeys'.  It is array of ke
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/util.js#L19-L70'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/util.js#L19-L70'>
       <span>src/util.js</span>
       </a>
     
@@ -1597,7 +1597,7 @@ exists, an Error is returned with the property 'missingKeys'.  It is array of ke
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/163edbbe88d0c6610ce365130ad55203051332f9/src/util.js#L82-L87'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/libp2p/js-libp2p-keychain/blob/be63323cef833672b585f4bab93e923138791179/src/util.js#L82-L87'>
       <span>src/util.js</span>
       </a>
     
