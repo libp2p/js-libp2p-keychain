@@ -45,6 +45,7 @@
     "libp2p-crypto": "^0.16.2",
     "merge-options": "^1.0.1",
     "node-forge": "^0.9.1",
+    "promisify-es6": "^1.0.3",
     "sanitize-filename": "^1.6.1"
   },
   "devDependencies": {
@@ -57,7 +58,6 @@
     "level": "^5.0.1",
     "multihashes": "^0.4.15",
     "peer-id": "^0.12.2",
-    "promisify-es6": "^1.0.3",
     "rimraf": "^2.6.3"
   },
   "contributors": [
