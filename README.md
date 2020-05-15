@@ -1,3 +1,6 @@
+⛔️ DEPRECATED: libp2p-keychain is now in [libp2p/src/keychain](https://github.com/libp2p/js-libp2p/tree/master/src/keychain)
+======
+
 # js-libp2p-keychain
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://protocol.ai)
