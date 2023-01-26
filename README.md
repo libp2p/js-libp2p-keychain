@@ -1,22 +1,38 @@
-⛔️ DEPRECATED: libp2p-keychain is now in [libp2p/src/keychain](https://github.com/libp2p/js-libp2p/tree/master/src/keychain) per [libp2p@0.28.0](https://github.com/libp2p/js-libp2p/releases/tag/v0.28.0).
-======
+# @libp2p/keychain <!-- omit in toc -->
 
-# js-libp2p-keychain
+[![libp2p.io](https://img.shields.io/badge/project-libp2p-yellow.svg?style=flat-square)](http://libp2p.io/)
+[![Discuss](https://img.shields.io/discourse/https/discuss.libp2p.io/posts.svg?style=flat-square)](https://discuss.libp2p.io)
+[![codecov](https://img.shields.io/codecov/c/github/libp2p/js-libp2p-keychain.svg?style=flat-square)](https://codecov.io/gh/libp2p/js-libp2p-keychain)
+[![CI](https://img.shields.io/github/actions/workflow/status/libp2p/js-libp2p-keychain/js-test-and-release.yml?branch=master\&style=flat-square)](https://github.com/libp2p/js-libp2p-keychain/actions/workflows/js-test-and-release.yml?query=branch%3Amaster)
 
-[![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://protocol.ai)
-[![](https://img.shields.io/badge/project-libp2p-yellow.svg?style=flat-square)](http://libp2p.io/)
-[![](https://img.shields.io/badge/freenode-%23libp2p-yellow.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23libp2p)
-[![Discourse posts](https://img.shields.io/discourse/https/discuss.libp2p.io/posts.svg)](https://discuss.libp2p.io)
-[![](https://img.shields.io/codecov/c/github/libp2p/js-libp2p-keychain.svg?style=flat-square)](https://codecov.io/gh/libp2p/js-libp2p-keychain)
-[![](https://img.shields.io/travis/libp2p/js-libp2p-keychain.svg?style=flat-square)](https://travis-ci.com/libp2p/js-libp2p-keychain)
-[![Dependency Status](https://david-dm.org/libp2p/js-libp2p-keychain.svg?style=flat-square)](https://david-dm.org/libp2p/js-libp2p-keychain)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
+> Key management and cryptographically protected messages
 
-> A secure key chain for libp2p in JavaScript
+## Table of contents <!-- omit in toc -->
 
-## Lead Maintainer
+- [Install](#install)
+  - [Browser `<script>` tag](#browser-script-tag)
+- [Features](#features)
+  - [KeyInfo](#keyinfo)
+  - [Private key storage](#private-key-storage)
+  - [Physical storage](#physical-storage)
+  - [Cryptographic Message Syntax (CMS)](#cryptographic-message-syntax-cms)
+- [API Docs](#api-docs)
+- [License](#license)
+- [Contribution](#contribution)
 
-[Vasco Santos](https://github.com/vasco-santos).
+## Install
+
+```console
+$ npm i @libp2p/keychain
+```
+
+### Browser `<script>` tag
+
+Loading this module through a script tag will make it's exports available as `Libp2pKeychain` in the global namespace.
+
+```html
+<script src="https://unpkg.com/@libp2p/keychain/dist/index.min.js"></script>
+```
 
 ## Features
 
@@ -28,49 +44,6 @@
 - Enforces NIST SP 800-131A and NIST SP 800-132
 - Uses PKCS 7: CMS (aka RFC 5652) to provide cryptographically protected messages
 - Delays reporting errors to slow down brute force attacks
-
-## Table of Contents
-
-## Install
-
-```sh
-npm install --save libp2p-keychain
-```
-
-### Usage
-
-```js
-const Keychain = require('libp2p-keychain')
-const FsStore = require('datastore-fs')
-
-const datastore = new FsStore('./a-keystore')
-const opts = {
-  passPhrase: 'some long easily remembered phrase'
-}
-const keychain = new Keychain(datastore, opts)
-```
-
-## API
-
-Managing a key
-
-- `async createKey (name, type, size)`
-- `async renameKey (oldName, newName)`
-- `async removeKey (name)`
-- `async exportKey (name, password)`
-- `async importKey (name, pem, password)`
-- `async importPeer (name, peer)`
-
-A naming service for a key
-
-- `async listKeys ()`
-- `async findKeyById (id)`
-- `async findKeyByName (name)`
-
-Cryptographically protected messages
-
-- `async cms.encrypt (name, plain)`
-- `async cms.decrypt (cmsData)`
 
 ### KeyInfo
 
@@ -113,14 +86,17 @@ The actual physical storage of an encrypted key is left to implementations of [i
 
 CMS, aka [PKCS #7](https://en.wikipedia.org/wiki/PKCS) and [RFC 5652](https://tools.ietf.org/html/rfc5652), describes an encapsulation syntax for data protection. It is used to digitally sign, digest, authenticate, or encrypt arbitrary message content. Basically, `cms.encrypt` creates a DER message that can be only be read by someone holding the private key.
 
-## Contribute
+## API Docs
 
-Feel free to join in. All welcome. Open an [issue](https://github.com/libp2p/js-libp2p-keychain/issues)!
-
-This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
-
-[![](https://cdn.rawgit.com/jbenet/contribute-ipfs-gif/master/img/contribute.gif)](https://github.com/ipfs/community/blob/master/CONTRIBUTING.md)
+- <https://libp2p.github.io/js-libp2p-keychain>
 
 ## License
 
-[MIT](LICENSE)
+Licensed under either of
+
+- Apache 2.0, ([LICENSE-APACHE](LICENSE-APACHE) / <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT ([LICENSE-MIT](LICENSE-MIT) / <http://opensource.org/licenses/MIT>)
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.

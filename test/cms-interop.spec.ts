@@ -1,30 +1,30 @@
 /* eslint max-nested-callbacks: ["error", 8] */
 /* eslint-env mocha */
-'use strict'
 
-const chai = require('chai')
-const dirtyChai = require('dirty-chai')
-const expect = chai.expect
-chai.use(dirtyChai)
-chai.use(require('chai-string'))
-const Keychain = require('..')
+import { expect } from 'aegir/chai'
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
+import { MemoryDatastore } from 'datastore-core/memory'
+import { KeyChain } from '../src/index.js'
 
-module.exports = (datastore) => {
-  describe('cms interop', () => {
-    const passPhrase = 'this is not a secure phrase'
-    const aliceKeyName = 'cms-interop-alice'
-    let ks
+describe('cms interop', () => {
+  const passPhrase = 'this is not a secure phrase'
+  const aliceKeyName = 'cms-interop-alice'
+  let ks: KeyChain
 
-    before(() => {
-      ks = new Keychain(datastore, { passPhrase: passPhrase })
-    })
+  before(async () => {
+    const datastore = new MemoryDatastore()
+    ks = new KeyChain({
+      datastore
+    }, { pass: passPhrase })
+  })
 
-    const plainData = Buffer.from('This is a message from Alice to Bob')
+  const plainData = uint8ArrayFromString('This is a message from Alice to Bob')
 
-    it('imports openssl key', async function () {
-      this.timeout(10 * 1000)
-      const aliceKid = 'QmNzBqPwp42HZJccsLtc4ok6LjZAspckgs2du5tTmjPfFA'
-      const alice = `-----BEGIN ENCRYPTED PRIVATE KEY-----
+  it('imports openssl key', async function () {
+    this.timeout(10 * 1000)
+    const aliceKid = 'QmNzBqPwp42HZJccsLtc4ok6LjZAspckgs2du5tTmjPfFA'
+    const alice = `-----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIMhYqiVoLJMICAggA
 MBQGCCqGSIb3DQMHBAhU7J9bcJPLDQSCAoDzi0dP6z97wJBs3jK2hDvZYdoScknG
 QMPOnpG1LO3IZ7nFha1dta5liWX+xRFV04nmVYkkNTJAPS0xjJOG9B5Hm7wm8uTd
@@ -42,13 +42,13 @@ igg5jozKCW82JsuWSiW9tu0F/6DuvYiZwHS3OLiJP0CuLfbOaRw8Jia1RTvXEH7m
 cn4oisOvxCprs4aM9UVjtZTCjfyNpX8UWwT1W3rySV+KQNhxuMy3RzmL
 -----END ENCRYPTED PRIVATE KEY-----
 `
-      const key = await ks.importKey(aliceKeyName, alice, 'mypassword')
-      expect(key.name).to.equal(aliceKeyName)
-      expect(key.id).to.equal(aliceKid)
-    })
+    const key = await ks.importKey(aliceKeyName, alice, 'mypassword')
+    expect(key.name).to.equal(aliceKeyName)
+    expect(key.id).to.equal(aliceKid)
+  })
 
-    it('decrypts node-forge example', async () => {
-      const example = `
+  it('decrypts node-forge example', async () => {
+    const example = `
 MIIBcwYJKoZIhvcNAQcDoIIBZDCCAWACAQAxgfowgfcCAQAwYDBbMQ0wCwYDVQQK
 EwRpcGZzMREwDwYDVQQLEwhrZXlzdG9yZTE3MDUGA1UEAxMuUW1OekJxUHdwNDJI
 WkpjY3NMdGM0b2s2TGpaQXNwY2tnczJkdTV0VG1qUGZGQQIBATANBgkqhkiG9w0B
@@ -58,9 +58,8 @@ knU1yykWGkdlbclCuu0NaAfmb8o0OX50CbEKZB7xmsv8tnqn0H0jMF4GCSqGSIb3
 DQEHATAdBglghkgBZQMEASoEEP/PW1JWehQx6/dsLkp/Mf+gMgQwFM9liLTqC56B
 nHILFmhac/+a/StQOKuf9dx5qXeGvt9LnwKuGGSfNX4g+dTkoa6N
 `
-      const plain = await ks.cms.decrypt(Buffer.from(example, 'base64'))
-      expect(plain).to.exist()
-      expect(plain.toString()).to.equal(plainData.toString())
-    })
+    const plain = await ks.cms.decrypt(uint8ArrayFromString(example.replace(/\s/g, ''), 'base64'))
+    expect(plain).to.exist()
+    expect(uint8ArrayToString(plain)).to.equal(uint8ArrayToString(plainData))
   })
-}
+})
