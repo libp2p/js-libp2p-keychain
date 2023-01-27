@@ -6,45 +6,39 @@ import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
 import { Key } from 'interface-datastore/key'
 import { MemoryDatastore } from 'datastore-core/memory'
-import { KeyChain, KeyChainInit, KeyInfo } from '../src/index.js'
+import { DefaultKeyChain, KeyChainInit } from '../src/index.js'
 import { pbkdf2 } from '@libp2p/crypto'
 import type { Datastore } from 'interface-datastore'
 import type { PeerId } from '@libp2p/interface-peer-id'
 import { createFromPrivKey } from '@libp2p/peer-id-factory'
 import { unmarshalPrivateKey } from '@libp2p/crypto/keys'
+import type { KeyChain, KeyInfo } from '@libp2p/interface-keychain'
 
 describe('keychain', () => {
   const passPhrase = 'this is not a secure phrase'
   const rsaKeyName = 'tajné jméno'
   const renamedRsaKeyName = 'ชื่อลับ'
   let rsaKeyInfo: KeyInfo
-  let emptyKeystore: KeyChain
-  let ks: KeyChain
-  let datastore1: Datastore, datastore2: Datastore
+  let ks: DefaultKeyChain
+  let datastore2: Datastore
 
   before(async () => {
-    datastore1 = new MemoryDatastore()
     datastore2 = new MemoryDatastore()
 
-    ks = new KeyChain({
+    ks = new DefaultKeyChain({
       datastore: datastore2
     }, { pass: passPhrase })
-    emptyKeystore = new KeyChain({
-      datastore: datastore1
-    }, { pass: passPhrase })
 
-    await datastore1.open()
     await datastore2.open()
   })
 
   after(async () => {
     await datastore2.close()
-    await datastore2.close()
   })
 
   it('can start without a password', async () => {
     await expect(async function () {
-      return new KeyChain({
+      return new DefaultKeyChain({
         datastore: datastore2
       }, {})
     }()).to.eventually.be.ok()
@@ -52,18 +46,18 @@ describe('keychain', () => {
 
   it('needs a NIST SP 800-132 non-weak pass phrase', async () => {
     await expect(async function () {
-      return new KeyChain({
+      return new DefaultKeyChain({
         datastore: datastore2
       }, { pass: '< 20 character' })
     }()).to.eventually.be.rejected()
   })
 
   it('has default options', () => {
-    expect(KeyChain.options).to.exist()
+    expect(DefaultKeyChain.options).to.exist()
   })
 
   it('supports supported hashing alorithms', async () => {
-    const ok = new KeyChain({
+    const ok = new DefaultKeyChain({
       datastore: datastore2
     }, { pass: passPhrase, dek: { hash: 'sha2-256', salt: 'salt-salt-salt-salt', iterationCount: 1000, keyLength: 14 } })
     expect(ok).to.exist()
@@ -71,14 +65,14 @@ describe('keychain', () => {
 
   it('does not support unsupported hashing alorithms', async () => {
     await expect(async function () {
-      return new KeyChain({
+      return new DefaultKeyChain({
         datastore: datastore2
       }, { pass: passPhrase, dek: { hash: 'my-hash', salt: 'salt-salt-salt-salt', iterationCount: 1000, keyLength: 14 } })
     }()).to.eventually.be.rejected()
   })
 
   it('can list keys without a password', async () => {
-    const keychain = new KeyChain({
+    const keychain = new DefaultKeyChain({
       datastore: datastore2
     }, {})
 
@@ -86,10 +80,10 @@ describe('keychain', () => {
   })
 
   it('can find a key without a password', async () => {
-    const keychain = new KeyChain({
+    const keychain = new DefaultKeyChain({
       datastore: datastore2
     }, {})
-    const keychainWithPassword = new KeyChain({
+    const keychainWithPassword = new DefaultKeyChain({
       datastore: datastore2
     }, { pass: `hello-${Date.now()}-${Date.now()}` })
     const name = `key-${Math.random()}`
@@ -100,10 +94,10 @@ describe('keychain', () => {
   })
 
   it('can remove a key without a password', async () => {
-    const keychainWithoutPassword = new KeyChain({
+    const keychainWithoutPassword = new DefaultKeyChain({
       datastore: datastore2
     }, {})
-    const keychainWithPassword = new KeyChain({
+    const keychainWithPassword = new DefaultKeyChain({
       datastore: datastore2
     }, { pass: `hello-${Date.now()}-${Date.now()}` })
     const name = `key-${Math.random()}`
@@ -115,7 +109,7 @@ describe('keychain', () => {
   })
 
   it('requires a name to create a password', async () => {
-    const keychain = new KeyChain({
+    const keychain = new DefaultKeyChain({
       datastore: datastore2
     }, {})
 
@@ -124,9 +118,9 @@ describe('keychain', () => {
   })
 
   it('can generate options', async () => {
-    const options = KeyChain.generateOptions()
+    const options = DefaultKeyChain.generateOptions()
     options.pass = passPhrase
-    const chain = new KeyChain({
+    const chain = new DefaultKeyChain({
       datastore: datastore2
     }, options)
     expect(chain).to.exist()
@@ -259,49 +253,6 @@ describe('keychain', () => {
         expect(key).to.have.property('name')
         expect(key).to.have.property('id')
       })
-    })
-  })
-
-  describe('CMS protected data', () => {
-    const plainData = uint8ArrayFromString('This is a message from Alice to Bob')
-    let cms: Uint8Array
-
-    it('service is available', () => {
-      expect(ks).to.have.property('cms')
-    })
-
-    it('requires a key', async () => {
-      await expect(ks.cms.encrypt('no-key', plainData)).to.eventually.be.rejected.with.property('code', 'ERR_KEY_NOT_FOUND')
-    })
-
-    it('requires plain data as a Uint8Array', async () => {
-      // @ts-expect-error invalid parameters
-      await expect(ks.cms.encrypt(rsaKeyName, 'plain data')).to.eventually.be.rejected.with.property('code', 'ERR_INVALID_PARAMETERS')
-    })
-
-    it('encrypts', async () => {
-      cms = await ks.cms.encrypt(rsaKeyName, plainData)
-      expect(cms).to.exist()
-      expect(cms).to.be.instanceOf(Uint8Array)
-    })
-
-    it('is a PKCS #7 message', async () => {
-      // @ts-expect-error invalid parameters
-      await expect(ks.cms.decrypt('not CMS')).to.eventually.be.rejected.with.property('code', 'ERR_INVALID_PARAMETERS')
-    })
-
-    it('is a PKCS #7 binary message', async () => {
-      await expect(ks.cms.decrypt(plainData)).to.eventually.be.rejected.with.property('code', 'ERR_INVALID_CMS')
-    })
-
-    it('cannot be read without the key', async () => {
-      await expect(emptyKeystore.cms.decrypt(cms)).to.eventually.be.rejected.with.property('code', 'ERR_MISSING_KEYS')
-    })
-
-    it('can be read with the key', async () => {
-      const plain = await ks.cms.decrypt(cms)
-      expect(plain).to.exist()
-      expect(uint8ArrayToString(plain)).to.equal(uint8ArrayToString(plainData))
     })
   })
 
@@ -501,7 +452,7 @@ describe('keychain', () => {
           hash: 'sha2-512'
         }
       }
-      kc = new KeyChain({
+      kc = new DefaultKeyChain({
         datastore: ds
       }, options)
       await ds.open()
@@ -565,15 +516,16 @@ describe('keychain', () => {
 describe('libp2p.keychain', () => {
   it('needs a passphrase to be used, otherwise throws an error', async () => {
     expect(() => {
-      const keychain = new KeyChain({
+      return new DefaultKeyChain({
         datastore: new MemoryDatastore()
-      }, {})
-      keychain.toString()
-    }).to.throw
+      }, {
+        pass: ''
+      })
+    }).to.throw()
   })
 
   it('can be used when a passphrase is provided', async () => {
-    const keychain = new KeyChain({
+    const keychain = new DefaultKeyChain({
       datastore: new MemoryDatastore()
     }, {
       pass: '12345678901234567890'
@@ -585,7 +537,7 @@ describe('libp2p.keychain', () => {
 
   it('can reload keys', async () => {
     const datastore = new MemoryDatastore()
-    const keychain = new KeyChain({
+    const keychain = new DefaultKeyChain({
       datastore
     }, {
       pass: '12345678901234567890'
@@ -594,7 +546,7 @@ describe('libp2p.keychain', () => {
     const kInfo = await keychain.createKey('keyName', 'Ed25519')
     expect(kInfo).to.exist()
 
-    const keychain2 = new KeyChain({
+    const keychain2 = new DefaultKeyChain({
       datastore
     }, {
       pass: '12345678901234567890'

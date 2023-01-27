@@ -15,7 +15,6 @@
   - [KeyInfo](#keyinfo)
   - [Private key storage](#private-key-storage)
   - [Physical storage](#physical-storage)
-  - [Cryptographic Message Syntax (CMS)](#cryptographic-message-syntax-cms)
 - [API Docs](#api-docs)
 - [License](#license)
 - [Contribution](#contribution)
@@ -42,7 +41,6 @@ Loading this module through a script tag will make it's exports available as `Li
 - Uses encrypted PKCS 8 for key storage
 - Uses PBKDF2 for a "stetched" key encryption key
 - Enforces NIST SP 800-131A and NIST SP 800-132
-- Uses PKCS 7: CMS (aka RFC 5652) to provide cryptographically protected messages
 - Delays reporting errors to slow down brute force attacks
 
 ### KeyInfo
@@ -81,10 +79,6 @@ const defaultOptions = {
 ### Physical storage
 
 The actual physical storage of an encrypted key is left to implementations of [interface-datastore](https://github.com/ipfs/interface-datastore/).  A key benifit is that now the key chain can be used in browser with the [js-datastore-level](https://github.com/ipfs/js-datastore-level) implementation.
-
-### Cryptographic Message Syntax (CMS)
-
-CMS, aka [PKCS #7](https://en.wikipedia.org/wiki/PKCS) and [RFC 5652](https://tools.ietf.org/html/rfc5652), describes an encapsulation syntax for data protection. It is used to digitally sign, digest, authenticate, or encrypt arbitrary message content. Basically, `cms.encrypt` creates a DER message that can be only be read by someone holding the private key.
 
 ## API Docs
 

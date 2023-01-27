@@ -43,7 +43,7 @@ describe('peer ID', () => {
   })
 
   it('encoded public key with DER', async () => {
-    const rsa = await supportedKeys.rsa.unmarshalRsaPublicKey(publicKeyDer)
+    const rsa = supportedKeys.rsa.unmarshalRsaPublicKey(publicKeyDer)
     const keyId = await rsa.hash()
     const kids = base58btc.encode(keyId).substring(1)
     expect(kids).to.equal(peer.toString())

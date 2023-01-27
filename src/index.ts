@@ -4,7 +4,6 @@ import { logger } from '@libp2p/logger'
 import sanitize from 'sanitize-filename'
 import mergeOptions from 'merge-options'
 import { Key } from 'interface-datastore/key'
-import { CMS } from './cms.js'
 import errCode from 'err-code'
 import { codes } from './errors.js'
 import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
@@ -14,7 +13,7 @@ import type { PeerId } from '@libp2p/interface-peer-id'
 import { pbkdf2, randomBytes } from '@libp2p/crypto'
 import type { Datastore } from 'interface-datastore'
 import { peerIdFromKeys } from '@libp2p/peer-id'
-import type { KeyTypes } from '@libp2p/crypto/keys'
+import type { KeyChain, KeyInfo, KeyType } from '@libp2p/interface-keychain'
 
 const log = logger('libp2p:keychain')
 
@@ -28,21 +27,6 @@ export interface DEKConfig {
 export interface KeyChainInit {
   pass?: string
   dek?: DEKConfig
-}
-
-/**
- * Information about a key.
- */
-export interface KeyInfo {
-  /**
-   * The universally unique key id
-   */
-  id: string
-
-  /**
-   * The local key name.
-   */
-  name: string
 }
 
 const keyPrefix = '/pkcs8/'
@@ -66,7 +50,7 @@ const defaultOptions = {
   }
 }
 
-function validateKeyName (name: string) {
+function validateKeyName (name: string): boolean {
   if (name == null) {
     return false
   }
@@ -82,7 +66,7 @@ function validateKeyName (name: string) {
  * This assumes than an error indicates that the keychain is under attack. Delay returning an
  * error to make brute force attacks harder.
  */
-async function randomDelay () {
+async function randomDelay (): Promise<void> {
   const min = 200
   const max = 1000
   const delay = Math.random() * (max - min) + min
@@ -93,14 +77,14 @@ async function randomDelay () {
 /**
  * Converts a key name into a datastore name
  */
-function DsName (name: string) {
+function DsName (name: string): Key {
   return new Key(keyPrefix + name)
 }
 
 /**
  * Converts a key name into a datastore info name
  */
-function DsInfoName (name: string) {
+function DsInfoName (name: string): Key {
   return new Key(infoPrefix + name)
 }
 
@@ -116,7 +100,7 @@ export interface KeyChainComponents {
  * - '/pkcs8/*key-name*', contains the PKCS #8 for the key
  *
  */
-export class KeyChain {
+export class DefaultKeyChain implements KeyChain {
   private readonly components: KeyChainComponents
   private readonly init: KeyChainInit
 
@@ -154,26 +138,6 @@ export class KeyChain {
   }
 
   /**
-   * Gets an object that can encrypt/decrypt protected data
-   * using the Cryptographic Message Syntax (CMS).
-   *
-   * CMS describes an encapsulation syntax for data protection. It
-   * is used to digitally sign, digest, authenticate, or encrypt
-   * arbitrary message content
-   */
-  get cms () {
-    const cached = privates.get(this)
-
-    if (cached == null) {
-      throw errCode(new Error('dek missing'), codes.ERR_INVALID_PARAMETERS)
-    }
-
-    const dek = cached.dek
-
-    return new CMS(this, dek)
-  }
-
-  /**
    * Generates the options for a keychain.  A random salt is produced.
    *
    * @returns {object}
@@ -191,7 +155,7 @@ export class KeyChain {
    *
    * @returns {object}
    */
-  static get options () {
+  static get options (): typeof defaultOptions {
     return defaultOptions
   }
 
@@ -202,7 +166,7 @@ export class KeyChain {
    * @param {string} type - One of the key types; 'rsa'.
    * @param {number} [size = 2048] - The key size in bits. Used for rsa keys only
    */
-  async createKey (name: string, type: KeyTypes, size = 2048): Promise<KeyInfo> {
+  async createKey (name: string, type: KeyType, size = 2048): Promise<KeyInfo> {
     if (!validateKeyName(name) || name === 'self') {
       await randomDelay()
       throw errCode(new Error('Invalid key name'), codes.ERR_INVALID_KEY_NAME)
@@ -244,7 +208,7 @@ export class KeyChain {
       const dek = cached.dek
       const pem = await keypair.export(dek)
       keyInfo = {
-        name: name,
+        name,
         id: kid
       }
       const batch = this.components.datastore.batch()
@@ -265,7 +229,7 @@ export class KeyChain {
    *
    * @returns {Promise<KeyInfo[]>}
    */
-  async listKeys () {
+  async listKeys (): Promise<KeyInfo[]> {
     const query = {
       prefix: infoPrefix
     }
@@ -284,7 +248,13 @@ export class KeyChain {
   async findKeyById (id: string): Promise<KeyInfo> {
     try {
       const keys = await this.listKeys()
-      return keys.find((k) => k.id === id)
+      const key = keys.find((k) => k.id === id)
+
+      if (key == null) {
+        throw errCode(new Error(`Key with id '${id}' does not exist.`), codes.ERR_KEY_NOT_FOUND)
+      }
+
+      return key
     } catch (err: any) {
       await randomDelay()
       throw err
@@ -320,7 +290,7 @@ export class KeyChain {
    * @param {string} name - The local key name; must already exist.
    * @returns {Promise<KeyInfo>}
    */
-  async removeKey (name: string) {
+  async removeKey (name: string): Promise<KeyInfo> {
     if (!validateKeyName(name) || name === 'self') {
       await randomDelay()
       throw errCode(new Error(`Invalid key name '${name}'`), codes.ERR_INVALID_KEY_NAME)
@@ -383,7 +353,7 @@ export class KeyChain {
   /**
    * Export an existing key as a PEM encrypted PKCS #8 string
    */
-  async exportKey (name: string, password: string) {
+  async exportKey (name: string, password: string): Promise<string> {
     if (!validateKeyName(name)) {
       await randomDelay()
       throw errCode(new Error(`Invalid key name '${name}'`), codes.ERR_INVALID_KEY_NAME)
@@ -415,7 +385,7 @@ export class KeyChain {
   /**
    * Export an existing key as a PeerId
    */
-  async exportPeerId (name: string) {
+  async exportPeerId (name: string): Promise<PeerId> {
     const password = 'temporary-password'
     const pem = await this.exportKey(name, password)
     const privateKey = await importKey(pem, password)
@@ -472,7 +442,7 @@ export class KeyChain {
     }
 
     const keyInfo = {
-      name: name,
+      name,
       id: kid
     }
     const batch = this.components.datastore.batch()
@@ -516,7 +486,7 @@ export class KeyChain {
       const dek = cached.dek
       const pem = await privateKey.export(dek)
       const keyInfo: KeyInfo = {
-        name: name,
+        name,
         id: peer.toString()
       }
       const batch = this.components.datastore.batch()
@@ -553,7 +523,7 @@ export class KeyChain {
   /**
    * Rotate keychain password and re-encrypt all associated keys
    */
-  async rotateKeychainPass (oldPass: string, newPass: string) {
+  async rotateKeychainPass (oldPass: string, newPass: string): Promise<void> {
     if (typeof oldPass !== 'string') {
       await randomDelay()
       throw errCode(new Error(`Invalid old pass type '${typeof oldPass}'`), codes.ERR_INVALID_OLD_PASS_TYPE)
